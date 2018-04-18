@@ -13,7 +13,6 @@ struct pthread_args
     int num_tasks;
     int range_y;
     int max_iter;
-    int start_y,end_y;
     double view_x0, view_x1, view_y0, view_y1;
     double x_stepsize, y_stepsize;
     int x_resolution,y_resolution;
@@ -27,58 +26,57 @@ void * kernel (void * args)
 
     double y;
     double x;
-
     complex double Z;
     complex double C;
-
     int k;
     
     pthread_mutex_t mutex =  PTHREAD_MUTEX_INITIALIZER;
-    pthread_mutex_lock (&mutex);
-    int start_y = (* arg->task_counter) * arg->range_y;
-    pthread_mutex_unlock (&mutex);
+    int start_y,end_y;
+    do
+    {
+	pthread_mutex_lock (&mutex);
+    	start_y = (* arg->task_counter) * arg->range_y;
+    	pthread_mutex_unlock (&mutex);
     
-    int end_y = start_y + arg->range_y;
-    if( end_y >= arg->y_resolution ) { end_y = arg->y_resolution; }
-    while( end_y < arg->y_resolution )
-    {
-    for(int i = start_y; i < end_y; i++)
-    {
-	for (int j = 0; j < arg->x_resolution; j++)
-	{
-		y = arg->view_y1 - i * arg->y_stepsize;
-		x = arg->view_x0 + j * arg->x_stepsize;
-
-		Z = 0 + 0 * I;
-		C = x + y * I;
-
-		k = 0;
-
-		do
+    	end_y = start_y + arg->range_y;
+    	if( end_y > arg->y_resolution ) { end_y = arg->y_resolution; }
+    	
+	for(int i = start_y; i < end_y; i++)
+    	{
+		for (int j = 0; j < arg->x_resolution; j++)
 		{
-			Z = Z * Z + C;
-			k++;
-		} while (cabs(Z) < 2 && k < arg->max_iter);
+			y = arg->view_y1 - i * arg->y_stepsize;
+			x = arg->view_x0 + j * arg->x_stepsize;
+			Z = 0 + 0 * I;
+			C = x + y * I;
+			k = 0;
 
-		if (k == arg->max_iter)
-		{
-			memcpy( arg->image + 3*i*arg->x_resolution+3*j, "\0\0\0", 3);
-		}
-		else
+			do
+			{
+				Z = Z * Z + C;
+				k++;
+			} while (cabs(Z) < 2 && k < arg->max_iter);
+
+			if (k == arg->max_iter)
+			{
+				memcpy( arg->image + 3*i*arg->x_resolution+3*j, "\0\0\0", 3);
+			}
+			else
 		//if (k != arg->max_iter)
-		{
-			int index = (k + arg->palette_shift)
+			{
+				int index = (k + arg->palette_shift)
 			            % (sizeof(colors) / sizeof(colors[0]));
-
-			memcpy( arg->image + 3*i*arg->x_resolution+3*j, colors[index], 3);
-		}
-	}	
-    }
-    pthread_mutex_lock (&mutex);
-    (*arg->task_counter)++;
-    start_y = (* arg->task_counter) * arg->range_y;
-    pthread_mutex_unlock (&mutex);
-    }
+				memcpy( arg->image + 3*i*arg->x_resolution+3*j, colors[index], 3);
+			}
+		}	
+    	}
+    	pthread_mutex_lock (&mutex);
+    	(*arg->task_counter)++;
+    	start_y = (* arg->task_counter) * arg->range_y;
+    	pthread_mutex_unlock (&mutex);
+    }while( end_y < arg->y_resolution )
+	   
+    pthread_mutex_destroy( &mutex );
     return NULL;
 }
 
@@ -98,46 +96,41 @@ void mandelbrot_draw(int x_resolution, int y_resolution, int max_iter,
 	int* task_counter = 0;
 	int num_tasks = y_resolution/range_y +1;
 	printf("hello");
-	for (int i = 0 ; i < num_threads ; ++i ) {
-        args[i].task_counter = task_counter;
+	
+	for (int i = 0 ; i < num_threads ; ++i ) 
+	{
+        	args[i].task_counter = task_counter;
         
-        pthread_mutex_lock (&mutex);
-        (*task_counter)++;
-        pthread_mutex_unlock(&mutex);
-        
-        args[i].num_tasks = num_tasks;
-        args[i].range_y = range_y;
-
-	args[i].max_iter = max_iter;
+        	args[i].num_tasks = num_tasks;
+        	args[i].range_y = range_y;
+		args[i].max_iter = max_iter;
+		args[i].view_x0 = view_x0;
+		args[i].view_x1 = view_x1;
+		args[i].view_y0 = view_y0;
+		args[i].view_y1 = view_y1;
+		args[i].x_stepsize = x_stepsize;
+		args[i].y_stepsize = y_stepsize;
+		args[i].image = (unsigned char*)image;
+		args[i].palette_shift = palette_shift;
+		args[i].x_resolution = x_resolution;
+		args[i].y_resolution = y_resolution;
+		
 		//args[i].start_y =i*range_y;
 		//printf("%d\n", args[i].start_y);
 		//args[i].end_y =i*range_y + range_y;
 		//if(args[i].end_y>=y_resolution) { args[i].end_y=y_resolution; }
 		//printf("%d\n",args[i].end_y);
 		
-	args[i].view_x0 = view_x0;
-	args[i].view_x1 = view_x1;
-	args[i].view_y0 = view_y0;
-	args[i].view_y1 = view_y1;
-
-	args[i].x_stepsize = x_stepsize;
-	args[i].y_stepsize = y_stepsize;
-
-	args[i].image = (unsigned char*)image;
-	args[i].palette_shift = palette_shift;
-
-	args[i].x_resolution = x_resolution;
-	args[i].y_resolution = y_resolution;
-
-	pthread_create (&threads[i] , NULL, kernel , args+i ) ;
+		pthread_create (&threads[i] , NULL, kernel , args+i ) ;
+	
+		pthread_mutex_lock (&mutex);
+        	(*task_counter)++;
+        	pthread_mutex_unlock(&mutex);
 	}
 
-	for (int i = 0 ; i < num_threads ; ++i ) {
-		pthread_join (threads[i] , NULL ) ;
-	}
-
+	for (int i = 0 ; i < num_threads ; ++i ) { pthread_join (threads[i] , NULL ) ; }
+	
+	pthread_mutex_destroy( &mutex );
 	free(threads);
 	free(args);
-	pthread_mutex_destroy( &mutex );
-
 }
