@@ -93,11 +93,13 @@ void mandelbrot_draw(int x_resolution, int y_resolution, int max_iter,
 	struct pthread_args * args = (struct pthread_args *) malloc ( num_threads* sizeof ( struct pthread_args ) ) ;
 	
 	int range_y = 64;
+	pthread_mutex_lock (&mutex);
 	int task_id =0;
 	int* task_counter = &task_id;
-	int num_tasks = y_resolution/range_y +1;
-	printf("hello");
-	printf("task=%d\n",*task_counter);	
+	printf("task=%d\n",*task_counter);
+	pthread_mutex_unlock(&mutex);
+	
+	int num_tasks = y_resolution/range_y +1;	
 
 	for (int i = 0 ; i < num_threads ; ++i ) 
 	{
