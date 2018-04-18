@@ -85,10 +85,11 @@ void mandelbrot_draw(int x_resolution, int y_resolution, int max_iter,
 	int range_y=y_resolution/num_threads+1;
 	//printf("%d\n", range_y);
 
-	//(unsigned char*)
+	//(unsigned char*)calloc
 
 	for (int i = 0 ; i < num_threads ; ++i ) {
-		printf("i=%d\n",i);
+		//printf("i=%d\n",i);
+
 		args[i].pthread_id = i;
 		args[i].max_iter = max_iter;
 
