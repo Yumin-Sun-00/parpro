@@ -31,12 +31,15 @@ void * kernel (void * args)
     int k;
     
     pthread_mutex_t mutex =  PTHREAD_MUTEX_INITIALIZER;
-    int start_y,end_y;
+    pthread_mutex_lock (&mutex);
+    int start_y = (* arg->task_counter) * arg->range_y;
+    pthread_mutex_unlock (&mutex);
+    int end_y;
     do
     {
-	pthread_mutex_lock (&mutex);
-    	start_y = (* arg->task_counter) * arg->range_y;
-    	pthread_mutex_unlock (&mutex);
+	//pthread_mutex_lock (&mutex);
+    	//start_y = (* arg->task_counter) * arg->range_y;
+    	//pthread_mutex_unlock (&mutex);
     
     	end_y = start_y + arg->range_y;
     	if( end_y > arg->y_resolution ) { end_y = arg->y_resolution; }
@@ -72,8 +75,8 @@ void * kernel (void * args)
     	}
     	pthread_mutex_lock (&mutex);
     	(*arg->task_counter)++;
-    	start_y = (* arg->task_counter) * arg->range_y;
-    	pthread_mutex_unlock (&mutex);
+	pthread_mutex_unlock (&mutex);
+    	start_y = start_y + arg->range_y;
     }while( end_y < arg->y_resolution );
 	   
     pthread_mutex_destroy( &mutex );
@@ -103,8 +106,10 @@ void mandelbrot_draw(int x_resolution, int y_resolution, int max_iter,
 
 	for (int i = 0 ; i < num_threads ; ++i ) 
 	{
+		pthread_mutex_lock (&mutex);
         	args[i].task_counter = task_counter;
-        
+        	pthread_mutex_unlock(&mutex);
+		
         	args[i].num_tasks = num_tasks;
         	args[i].range_y = range_y;
 		args[i].max_iter = max_iter;
