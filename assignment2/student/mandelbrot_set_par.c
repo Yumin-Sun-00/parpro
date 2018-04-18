@@ -99,7 +99,7 @@ void mandelbrot_draw(int x_resolution, int y_resolution, int max_iter,
 	
 	int range_y = 64;
 	pthread_mutex_lock (&mutex);
-	int task_id =0;
+	int task_id =-1;
 	int* task_counter = &task_id;
 	//printf("task=%d\n",*task_counter);
 	pthread_mutex_unlock(&mutex);
@@ -108,6 +108,10 @@ void mandelbrot_draw(int x_resolution, int y_resolution, int max_iter,
 
 	for (int i = 0 ; i < num_threads ; ++i ) 
 	{
+		pthread_mutex_lock (&mutex);
+        	(*task_counter)++;
+        	pthread_mutex_unlock(&mutex);
+		
 		pthread_mutex_lock (&mutex);
         	args[i].task_counter = task_counter;
 		printf("thread %d,task=%d\n",i,*task_counter);
@@ -134,10 +138,6 @@ void mandelbrot_draw(int x_resolution, int y_resolution, int max_iter,
 		//printf("%d\n",args[i].end_y);
 		
 		pthread_create (&threads[i] , NULL, kernel , args+i ) ;
-	
-		pthread_mutex_lock (&mutex);
-        	(*task_counter)++;
-        	pthread_mutex_unlock(&mutex);
 	}
 
 	for (int i = 0 ; i < num_threads ; ++i ) { pthread_join (threads[i] , NULL ) ; }
