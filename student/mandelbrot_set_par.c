@@ -12,12 +12,14 @@ struct pthread_args
 {
 	int pthread_id;
 	int max_iter;
-	int start_x,start_y,end_x,end_y;
+	int start_y,end_y;
 	double view_x0, view_x1, view_y0, view_y1;
 	double x_stepsize, y_stepsize;
-	unsigned char *image;
-	int palette_shift;
 	int x_resolution,y_resolution;
+	int palette_shift;
+	unsigned char *image;
+
+
 };
 
 void * kernel (void * args)
@@ -36,7 +38,7 @@ void * kernel (void * args)
 
 	for (int i = arg->start_y; i < arg->end_y; i++)
 	{
-		for (int j = arg->start_x; j < arg->end_x; j++)
+		for (int j = 0; j < arg->x_resolution; j++)
 		{
 			y = arg->view_y1 - i * arg->y_stepsize;
 			x = arg->view_x0 + j * arg->x_stepsize;
@@ -57,6 +59,7 @@ void * kernel (void * args)
 				memcpy( arg->image + 3*i*arg->x_resolution+3*j, "\0\0\0", 3);
 			}
 			else
+			//if (k != arg->max_iter)
 			{
 				int index = (k + arg->palette_shift)
 				            % (sizeof(colors) / sizeof(colors[0]));
@@ -79,29 +82,24 @@ void mandelbrot_draw(int x_resolution, int y_resolution, int max_iter,
 	pthread_t * threads = ( pthread_t *) malloc ( num_threads* sizeof ( pthread_t ) ) ;
 	struct pthread_args * args = (struct pthread_args *) malloc ( num_threads* sizeof ( struct pthread_args ) ) ;
 
-	int range_x=x_resolution/num_threads;
-	int range_y=y_resolution/num_threads;
+	int range_y=y_resolution/num_threads+1;
+	//printf("%d\n", range_y);
+
+	//(unsigned char*)
 
 	for (int i = 0 ; i < num_threads ; ++i ) {
+		printf("i=%d\n",i);
 		args[i].pthread_id = i;
 		args[i].max_iter = max_iter;
 
-		args[i].start_x =i*range_x;
 		args[i].start_y =i*range_y;
-		
-		args[i].end_x =i*range_x + range_x;
+		//printf("%d\n", args[i].start_y);
+
 		args[i].end_y =i*range_y + range_y;
-
-		if(args[i].end_x>=x_resolution)
-		{
-			args[i].end_x=x_resolution;
-		}
-
-		if(args[i].end_y>=y_resolution)
-		{
-			args[i].end_y=y_resolution;
-		}
-
+		
+		if(args[i].end_y>=y_resolution) { args[i].end_y=y_resolution; }
+		//printf("%d\n",args[i].end_y);
+		
 		args[i].view_x0 = view_x0;
 		args[i].view_x1 = view_x1;
 		args[i].view_y0 = view_y0;
