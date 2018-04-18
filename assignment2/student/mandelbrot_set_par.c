@@ -74,7 +74,7 @@ void * kernel (void * args)
     	(*arg->task_counter)++;
     	start_y = (* arg->task_counter) * arg->range_y;
     	pthread_mutex_unlock (&mutex);
-    }while( end_y < arg->y_resolution )
+    }while( end_y < arg->y_resolution );
 	   
     pthread_mutex_destroy( &mutex );
     return NULL;
