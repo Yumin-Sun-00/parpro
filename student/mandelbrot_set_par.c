@@ -82,7 +82,7 @@ void mandelbrot_draw(int x_resolution, int y_resolution, int max_iter,
 	int range_x=x_resolution/num_threads;
 	int range_y=y_resolution/num_threads;
 
-	for (int i = 0 ; i < num_threads ; ++i ) {
+	for (int i = 0 ; i < num_threads*2 ; ++i ) {
 		args[i].pthread_id = i;
 		args[i].max_iter = max_iter;
 
