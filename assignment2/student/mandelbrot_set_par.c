@@ -10,6 +10,7 @@
 struct pthread_args
 {
     int* task_counter;
+    int id;
     int num_tasks;
     int range_y;
     int max_iter;
@@ -33,7 +34,7 @@ void * kernel (void * args)
     pthread_mutex_t mutex =  PTHREAD_MUTEX_INITIALIZER;
     pthread_mutex_lock (&mutex);
     int start_y = (* arg->task_counter) * arg->range_y;
-    printf("first task: start_y=%d\n",start_y);
+    printf("thread%d first task: start_y=%d\n",arg->id,start_y);
     pthread_mutex_unlock (&mutex);
     int end_y;
     do
@@ -48,6 +49,7 @@ void * kernel (void * args)
     	
 	for(int i = start_y; i < end_y; i++)
     	{
+		printf("thread%d : start_y=%d\n, end_y=%d\n",arg->id,start_y,end_y);
 		for (int j = 0; j < arg->x_resolution; j++)
 		{
 			y = arg->view_y1 - i * arg->y_stepsize;
@@ -110,13 +112,11 @@ void mandelbrot_draw(int x_resolution, int y_resolution, int max_iter,
 	{
 		pthread_mutex_lock (&mutex);
         	(*task_counter)++;
-        	pthread_mutex_unlock(&mutex);
-		
-		pthread_mutex_lock (&mutex);
         	args[i].task_counter = task_counter;
 		printf("thread %d,task=%d\n",i,*task_counter);
         	pthread_mutex_unlock(&mutex);
 		
+		args[i].id = i;
         	args[i].num_tasks = num_tasks;
         	args[i].range_y = range_y;
 		args[i].max_iter = max_iter;
