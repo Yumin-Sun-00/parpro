@@ -83,20 +83,22 @@ void * kernel (void * args)
 void mandelbrot_draw(int x_resolution, int y_resolution, int max_iter,
 	                double view_x0, double view_x1, double view_y0, double view_y1,
 	                double x_stepsize, double y_stepsize,
-	                int palette_shift, unsigned char (*image)[x_resolution][3],
-						 int num_threads) 
+	                int palette_shift, unsigned char (*image)[x_resolution][3], int num_threads) 
 {
 	printf("hello...");
+
 	pthread_mutex_t mutex =  PTHREAD_MUTEX_INITIALIZER;
 
 	pthread_t * threads = ( pthread_t *) malloc ( num_threads* sizeof ( pthread_t ) ) ;
 	struct pthread_args * args = (struct pthread_args *) malloc ( num_threads* sizeof ( struct pthread_args ) ) ;
 	
 	int range_y = 64;
-	int* task_counter = 0;
+	int task_id =0;
+	int* task_counter = &task_id;
 	int num_tasks = y_resolution/range_y +1;
 	printf("hello");
-	
+	printf("task=%d\n",*task_counter);	
+
 	for (int i = 0 ; i < num_threads ; ++i ) 
 	{
         	args[i].task_counter = task_counter;
@@ -133,4 +135,5 @@ void mandelbrot_draw(int x_resolution, int y_resolution, int max_iter,
 	pthread_mutex_destroy( &mutex );
 	free(threads);
 	free(args);
+
 }
