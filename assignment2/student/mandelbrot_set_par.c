@@ -7,6 +7,8 @@
 
 #include "mandelbrot_set.h"
 
+pthread_mutex_t mutex =  PTHREAD_MUTEX_INITIALIZER;
+
 struct pthread_args
 {
     int* task_counter;
@@ -31,7 +33,7 @@ void * kernel (void * args)
     complex double C;
     int k;
     
-    pthread_mutex_t mutex =  PTHREAD_MUTEX_INITIALIZER;
+    //pthread_mutex_t mutex =  PTHREAD_MUTEX_INITIALIZER;
     pthread_mutex_lock (&mutex);
     int start_y = (* arg->task_counter) * arg->range_y;
     printf("thread%d first task: start_y=%d\n",arg->id,start_y);
@@ -83,7 +85,7 @@ void * kernel (void * args)
     	start_y = start_y + arg->range_y;
     }while( end_y < arg->y_resolution );
 	   
-    pthread_mutex_destroy( &mutex );
+    //pthread_mutex_destroy( &mutex );
     return NULL;
 }
 
@@ -94,7 +96,7 @@ void mandelbrot_draw(int x_resolution, int y_resolution, int max_iter,
 {
 	printf("hello...");
 
-	pthread_mutex_t mutex =  PTHREAD_MUTEX_INITIALIZER;
+//	pthread_mutex_t mutex =  PTHREAD_MUTEX_INITIALIZER;
 
 	pthread_t * threads = ( pthread_t *) malloc ( num_threads* sizeof ( pthread_t ) ) ;
 	struct pthread_args * args = (struct pthread_args *) malloc ( num_threads* sizeof ( struct pthread_args ) ) ;
