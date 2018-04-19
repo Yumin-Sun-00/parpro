@@ -12,6 +12,7 @@ pthread_mutex_t mutex =  PTHREAD_MUTEX_INITIALIZER;
 struct pthread_args
 {
     int* task_counter;
+    char dummy [64];
     int id;
     int num_tasks;
     int range_y;
@@ -25,30 +26,26 @@ struct pthread_args
 
 void * kernel (void * args)
 {
-    struct pthread_args * arg = (struct pthread_args *) args;
-
     double y;
     double x;
     complex double Z;
     complex double C;
     int k;
-    
-    //pthread_mutex_t mutex =  PTHREAD_MUTEX_INITIALIZER;
+
+    int start_y, end_y;
+
+    struct pthread_args * arg = (struct pthread_args *) args;
+     
     pthread_mutex_lock (&mutex);
-    int start_y = (* arg->task_counter) * arg->range_y;
-    printf("thread%d first task: start_y=%d\n",arg->id,start_y);
+    start_y = (* arg->task_counter) * arg->range_y;
     pthread_mutex_unlock (&mutex);
-    int end_y;
-    do
-    {
-	//pthread_mutex_lock (&mutex);
-    	//start_y = (* arg->task_counter) * arg->range_y;
-    	//pthread_mutex_unlock (&mutex);
     
-    	end_y = start_y + arg->range_y;
-    	if( end_y > arg->y_resolution ) { end_y = arg->y_resolution; }
-	printf("end_y=%d\n",end_y);
-    	
+    printf("thread%d new task: start_y=%d\n",arg->id,start_y);
+    end_y = start_y + arg->range_y;
+    if( end_y > arg->y_resolution ) { end_y = arg->y_resolution; }
+    printf("end_y=%d\n",end_y);//	pthread_mutex_unlock (&mutex);
+    do
+    {	
 	for(int i = start_y; i < end_y; i++)
     	{
 		printf("thread%d : start_y=%d\n, end_y=%d\n",arg->id,start_y,end_y);
@@ -79,10 +76,16 @@ void * kernel (void * args)
 			}
 		}	
     	}
-    	pthread_mutex_lock (&mutex);
-    	(*arg->task_counter)++;
+  	pthread_mutex_lock (&mutex);
+  	//if((*arg->task_counter)<arg->num_tasks-1)
+	//{	
+		(*arg->task_counter)++;
+		start_y = start_y + arg->range_y;
+		end_y = start_y+arg->range_y;	
+		if( end_y > arg->y_resolution ) { end_y = arg->y_resolution; }
+	//}
 	pthread_mutex_unlock (&mutex);
-    	start_y = start_y + arg->range_y;
+    	//start_y = start_y + arg->range_y;
     }while( end_y < arg->y_resolution );
 	   
     //pthread_mutex_destroy( &mutex );
@@ -96,18 +99,12 @@ void mandelbrot_draw(int x_resolution, int y_resolution, int max_iter,
 {
 	printf("hello...");
 
-//	pthread_mutex_t mutex =  PTHREAD_MUTEX_INITIALIZER;
-
 	pthread_t * threads = ( pthread_t *) malloc ( num_threads* sizeof ( pthread_t ) ) ;
 	struct pthread_args * args = (struct pthread_args *) malloc ( num_threads* sizeof ( struct pthread_args ) ) ;
 	
 	int range_y = 64;
-	pthread_mutex_lock (&mutex);
 	int task_id =-1;
 	int* task_counter = &task_id;
-	//printf("task=%d\n",*task_counter);
-	pthread_mutex_unlock(&mutex);
-	
 	int num_tasks = y_resolution/range_y +1;	
 
 	for (int i = 0 ; i < num_threads ; ++i ) 
