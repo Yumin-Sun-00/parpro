@@ -44,11 +44,13 @@ void * kernel (void * args)
     end_y = start_y + arg->range_y;
     if( end_y > arg->y_resolution ) { end_y = arg->y_resolution; }
     printf("end_y=%d\n",end_y);//	pthread_mutex_unlock (&mutex);
+int while_loop = 0;
     do
-    {	
+    {	while_loop++;
+	printf("num of loop=%d",while_loop);
 	for(int i = start_y; i < end_y; i++)
     	{
-		printf("thread%d : start_y=%d\n, end_y=%d\n",arg->id,start_y,end_y);
+		//printf("thread%d : start_y=%d\n, end_y=%d\n",arg->id,start_y,end_y);
 		for (int j = 0; j < arg->x_resolution; j++)
 		{
 			y = arg->view_y1 - i * arg->y_stepsize;
@@ -80,13 +82,13 @@ void * kernel (void * args)
   	//if((*arg->task_counter)<arg->num_tasks-1)
 	//{	
 		(*arg->task_counter)++;
-		start_y = start_y + arg->range_y;
+		start_y = end_y;
 		end_y = start_y+arg->range_y;	
 		if( end_y > arg->y_resolution ) { end_y = arg->y_resolution; }
 	//}
 	pthread_mutex_unlock (&mutex);
     	//start_y = start_y + arg->range_y;
-    }while( end_y < arg->y_resolution );
+    }while( start_y < arg->y_resolution );
 	   
     //pthread_mutex_destroy( &mutex );
     return NULL;
@@ -99,13 +101,18 @@ void mandelbrot_draw(int x_resolution, int y_resolution, int max_iter,
 {
 	printf("hello...");
 
+        int range_y = 64;
+        int task_id =-1;
+        int* task_counter = &task_id;
+        int num_tasks = y_resolution/range_y +1;
+
 	pthread_t * threads = ( pthread_t *) malloc ( num_threads* sizeof ( pthread_t ) ) ;
 	struct pthread_args * args = (struct pthread_args *) malloc ( num_threads* sizeof ( struct pthread_args ) ) ;
 	
-	int range_y = 64;
-	int task_id =-1;
-	int* task_counter = &task_id;
-	int num_tasks = y_resolution/range_y +1;	
+//	int range_y = 64;
+//	int task_id =-1;
+//	int* task_counter = &task_id;
+//	int num_tasks = y_resolution/range_y +1;	
 
 	for (int i = 0 ; i < num_threads ; ++i ) 
 	{
