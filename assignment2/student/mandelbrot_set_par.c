@@ -92,7 +92,7 @@ void * kernel (void * args)
 	//printf("next task=%d",current_task);
 	pthread_mutex_unlock (&mutex);		
 	
-    }while( current_task  < num_tasks);
+    }while( current_task  < arg->num_tasks);
 
     return NULL;
 }
@@ -110,16 +110,16 @@ void mandelbrot_draw(int x_resolution, int y_resolution, int max_iter,
 	for (int i = 0 ; i < num_threads ; ++i ) 
 	{	
 		//args[i].id = i;
-        args[i]->num_tasks = y_resolution/range_y +1;
-        args[i]->max_iter_g = max_iter;
-        args[i]->view_x0_g = view_x0;
-        args[i]->view_y1_g = view_y1;
-        args[i]->x_stepsize_g = x_stepsize;
-        args[i]->y_stepsize_g = y_stepsize;
-        args[i]->image_g =(unsigned char*) image;
-        args[i]->palette_shift_g = palette_shift;
-        args[i]->x_resolution_g = x_resolution;
-        args[i]->y_resolution_g = y_resolution;
+        args[i].num_tasks = y_resolution/range_y +1;
+        args[i].max_iter_g = max_iter;
+        args[i].view_x0_g = view_x0;
+        args[i].view_y1_g = view_y1;
+        args[i].x_stepsize_g = x_stepsize;
+        args[i].y_stepsize_g = y_stepsize;
+        args[i].image_g =(unsigned char*) image;
+        args[i].palette_shift_g = palette_shift;
+        args[i].x_resolution_g = x_resolution;
+        args[i].y_resolution_g = y_resolution;
 
 		pthread_create (&threads[i] , NULL, kernel , args+i ) ;
 		//pthread_create (&threads[i] , NULL, kernel , NULL ) ;
