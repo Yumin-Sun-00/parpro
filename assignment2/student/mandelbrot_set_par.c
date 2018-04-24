@@ -8,19 +8,19 @@
 #include "mandelbrot_set.h"
 
 pthread_mutex_t mutex =  PTHREAD_MUTEX_INITIALIZER;
+int task_counter = -1;
+static int range_y = 16;
+//arg to global variables
+int num_tasks;
+int x_resolution_g,y_resolution_g,max_iter_g;
+double view_x0_g,view_y1_g;
+double x_stepsize_g, y_stepsize_g;
+int palette_shift_g; 
+unsigned char* image_g;
         
 struct pthread_args
 {
-    int* task_counter;
-    int start_task;
-    int num_tasks;
-    int range_y;
-    int max_iter;
-    double view_x0, view_x1, view_y0, view_y1;
-    double x_stepsize, y_stepsize;
-    int x_resolution,y_resolution;
-    int palette_shift;
-    unsigned char *image;
+    int id;
 };
 
 void * kernel (void * args)
@@ -35,23 +35,28 @@ void * kernel (void * args)
     int current_task;
     struct pthread_args * arg = (struct pthread_args *) args;
     
-    current_task = arg->start_task;
+    pthread_mutex_lock (&mutex);
+    task_counter++;		
+    current_task = task_counter;
+    pthread_mutex_unlock(&mutex);
+
+    //printf("start=%d\n",current_task);
     //int while_loop = 0;
     do
-    {	//while_loop++;
+    {//	while_loop++;
 	//printf("num of loop=%d",while_loop);
-	start_y = current_task * arg->range_y;
-    	//printf("thread%d new task: start_y=%d\n",arg->id,start_y);
-    	end_y = start_y + arg->range_y;
-    	if( end_y > arg->y_resolution ) { end_y = arg->y_resolution; }
+	start_y = current_task * range_y;
+	//printf("start=%d\n",current_task);
+    	//printf("thread%d new task: start_y=%d ",arg->id,start_y);
+    	end_y = start_y + range_y;
+    	if( end_y > y_resolution_g ) { end_y = y_resolution_g; }
    	//printf("end_y=%d\n",end_y);
 	for(int i = start_y; i < end_y ; i++)
     	{
-		//printf("thread%d : start_y=%d\n, end_y=%d\n",arg->id,start_y,end_y);
-		for (int j = 0; j < arg->x_resolution; j++)
+		for (int j = 0; j < x_resolution_g; j++)
 		{
-			y = arg->view_y1 - i * arg->y_stepsize;
-			x = arg->view_x0 + j * arg->x_stepsize;
+			y = view_y1_g - i * y_stepsize_g;
+			x = view_x0_g + j * x_stepsize_g;
 			Z = 0 + 0 * I;
 			C = x + y * I;
 			k = 0;
@@ -60,28 +65,29 @@ void * kernel (void * args)
 			{
 				Z = Z * Z + C;
 				k++;
-			} while (cabs(Z) < 2 && k < arg->max_iter);
+			} while (cabs(Z) < 2 && k < max_iter_g);
 
-			if (k == arg->max_iter)
+			if (k == max_iter_g)
 			{
-				memcpy( arg->image + 3*i*arg->x_resolution+3*j, "\0\0\0", 3);
+				memcpy( image_g + 3*i*x_resolution_g+3*j, "\0\0\0", 3);
 			}
 			else
 			//if (k != arg->max_iter)
 			{
-				int index = (k + arg->palette_shift)
+				int index = (k + palette_shift_g)
 			            % (sizeof(colors) / sizeof(colors[0]));
-				memcpy( arg->image + 3*i*arg->x_resolution+3*j, colors[index], 3);
+				memcpy( image_g + 3*i*x_resolution_g+3*j, colors[index], 3);
 			}
 		}	
     	}
 
   	pthread_mutex_lock (&mutex);
-  	current_task = (*arg->task_counter)+1;
-	(*arg->task_counter)++;
+	task_counter ++;
+	current_task= task_counter;	
+	//printf("next task=%d",current_task);
 	pthread_mutex_unlock (&mutex);		
 	
-    }while( current_task  < arg->num_tasks);
+    }while( current_task  < num_tasks);
 
     return NULL;
 }
@@ -91,55 +97,26 @@ void mandelbrot_draw(int x_resolution, int y_resolution, int max_iter,
 	                double x_stepsize, double y_stepsize,
 	                int palette_shift, unsigned char (*image)[x_resolution][3], int num_threads) 
 {
-	int range_y = 512;
-	int task_id =-1;
-        int* task_counter = &task_id;
-        int num_tasks = y_resolution/range_y +1;
+        num_tasks = y_resolution/range_y +1;
+	max_iter_g = max_iter;
+	view_x0_g = view_x0;
+	view_y1_g = view_y1;
+	x_stepsize_g = x_stepsize;
+	y_stepsize_g = y_stepsize;
+	image_g =(unsigned char*) image;
+	palette_shift_g = palette_shift;
+	x_resolution_g = x_resolution;
+	y_resolution_g = y_resolution;
 
 	pthread_t * threads = ( pthread_t *) malloc ( num_threads* sizeof ( pthread_t ) ) ;
 	struct pthread_args * args = (struct pthread_args *) malloc ( num_threads* sizeof ( struct pthread_args ) ) ;	
 
-	//image = calloc(y_resolution, sizeof(unsigned char[x_resolution][3]));
-	//for(int i = 0; i < y_resolution; i++)
-	//{
-	//	image[i] = (unsigned char**)calloc(x_resolution,sizeof(unsigned char*));
-	//	for(int j = 0; j<x_resolution; j++)
-	//	{
-	//		image[i][j] = (unsigned char*)calloc(3,sizeof(unsigned char));
-	//	}
-	//}
-
-	//if (image == NULL )
-	//{
-	//	perror("calloc");
-	//	exit(EXIT_FAILURE);
-	//}
-
-
 	for (int i = 0 ; i < num_threads ; ++i ) 
-	{
-		pthread_mutex_lock (&mutex);
-		(*task_counter)++;        	
-        	args[i].task_counter = task_counter;
-		args[i].start_task = (*task_counter);
-		//printf("thread %d,task=%d\n",i,*task_counter);
-		pthread_mutex_unlock(&mutex);
+	{	
+		//args[i].id = i;
 
-        	args[i].num_tasks = num_tasks;
-        	args[i].range_y = range_y;
-		args[i].max_iter = max_iter;
-		args[i].view_x0 = view_x0;
-		args[i].view_x1 = view_x1;
-		args[i].view_y0 = view_y0;
-		args[i].view_y1 = view_y1;
-		args[i].x_stepsize = x_stepsize;
-		args[i].y_stepsize = y_stepsize;
-		args[i].image =(unsigned char*) image;
-		args[i].palette_shift = palette_shift;
-		args[i].x_resolution = x_resolution;
-		args[i].y_resolution = y_resolution;
-
-		pthread_create (&threads[i] , NULL, kernel , args+i ) ;
+		//pthread_create (&threads[i] , NULL, kernel , args+i ) ;
+		pthread_create (&threads[i] , NULL, kernel , NULL ) ;
 	}
 
 	for (int i = 0 ; i < num_threads ; ++i ) { pthread_join (threads[i] , NULL ) ; }
