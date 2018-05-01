@@ -23,9 +23,11 @@ static int range_y = 8;// amount of computations is same for any task, because a
 template <typename SrcView, typename DstView>
 void kernel(const SrcView& src, const DstView& dst, const int task)
 {
+
+	//cout<<"task="<<task<<endl;
 	typedef typename channel_type<DstView>::type dst_channel_t;
-    int current_task = task;
-    int start_y = current_task * range_y;
+    //int current_task = task;
+    int start_y = task * range_y;
     int end_y = start_y + range_y;
     if( end_y > src.height()) end_y = src.height();
 
@@ -104,10 +106,10 @@ void x_gradient(const SrcView& src, const DstView& dst, int num_threads) {
     //std::thread * threads = ( std::thread *) malloc ( num_threads* sizeof ( std::thread ) ) ;
 
     int num_tasks = src.height()/range_y + 1;
-
+	vector<future<void>> fut = vector<future<void>>(num_tasks);
     for(int i = 0; i < num_tasks; i++){
-        auto fut = async(launch::async, kernel<SrcView, DstView>, std::ref(src), std::ref(dst), i);
 
+        fut[i] = async(launch::async, kernel<SrcView, DstView>, std::ref(src), std::ref(dst), i);
 
 //        promise<int> myPromise;
 //        future<int> myFuture = myPromise.get_future();
