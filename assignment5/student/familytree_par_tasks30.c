@@ -1,7 +1,7 @@
 #include "familytree.h"
 #include <omp.h>
 
-#define T 10
+#define T 30
 
 void traverse(tree *node, int numThreads){
 	omp_set_num_threads( numThreads);
@@ -18,13 +18,13 @@ void traverse(tree *node, int numThreads){
                 //	        genius[node->id] = node->IQ;
                 	
 	
-        			#pragma omp task final(node->id > T*numThreads)// firstprivate(numThreads) shared(node)//firstprivate(node,numThreads)
+        			#pragma omp task final(node->id > T)// firstprivate(numThreads) shared(node)//firstprivate(node,numThreads)
         			{
 //                              printf("hello1");
                 			traverse(node->right, numThreads);
         			}
 
-        			#pragma omp task final(node->id > T*numThreads)// firstprivate(numThreads) shared(node)//firstprivate(node,numThreads)
+        			#pragma omp task final(node->id > T)// firstprivate(numThreads) shared(node)//firstprivate(node,numThreads)
        				{
 //                              printf("hello2");
                 			traverse(node->left, numThreads);
