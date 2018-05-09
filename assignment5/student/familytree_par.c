@@ -7,7 +7,7 @@
 void traverse(tree *node, int numThreads){
 
 omp_set_nested(1);
-omp_set_max_active_levels(4);
+omp_set_max_active_levels(5);
 
 	#pragma omp parallel
 	{
