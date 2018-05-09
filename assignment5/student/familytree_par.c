@@ -27,5 +27,3 @@ void traverse(tree *node, int numThreads){
 		}
 	}
 
-}
-
