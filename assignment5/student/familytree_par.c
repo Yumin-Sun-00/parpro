@@ -7,9 +7,9 @@
 void traverse(tree *node, int numThreads){
 
 omp_set_nested(1);
-omp_set_max_active_levels(3);
+omp_set_max_active_levels(4);
 
-	#pragma omp parallel shared(numThreads)
+	#pragma omp parallel
 	{
 		if(node != NULL){
 			node->IQ = compute_IQ(node->data);
