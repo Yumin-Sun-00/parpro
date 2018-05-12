@@ -3,11 +3,6 @@
 
 #define T 20
 
-//void process(tree *node){
-//    node->IQ = compute_IQ(node->data);
-//    genius[node->id] = node->IQ;
-//}
-
 void traverse_kernel(tree *node,int depth){
     if(node!=NULL)
     {
