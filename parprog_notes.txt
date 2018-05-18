@@ -1,0 +1,9 @@
+
+omp_set_nested(1)
+If nested parallelism is disabled, then the new team created by a thread encountering a parallel construct inside a parallel region consists only of the encountering thread. If nested parallelism is enabled, then the new team may consist of more than one thread.
+
+#pragma omp critical
+A thread waits at the start of a critical region identified by a given name until no other thread in the program is executing a critical region with that same name. Critical sections not specifically named by omp critical directive invocation are mapped to the same unspecified name.
+
+Memory Affinity: "First Touch" Policy
+In order to get optimal performance it is best for each thread of execution to allocate memory "closest" to the core on which it is executing. This is accomplished by allocating and immediately initializing memory from the thread that will be using it.  This is often referred to as a “first touch” policy because the OS allocates memory as close as possible to the thread that "first touches" (initializes) it.
