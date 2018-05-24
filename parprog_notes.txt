@@ -1,4 +1,12 @@
+# assignment 7: make
 
+NOTE: 
+1. Some of the gcc versions does not support -Wpedantic compiler flag. If you get an error saying Unrecognized command line option "-Wpedantic", change the flag to -pedantic in Makefile 
+2. Add -lrt option to LDFLAGS in case you get Undefined reference to "clock_gettime" error.
+3. If your speedup is close behind the required one, try to submit again. The server utilization varies. 
+
+
+# General about OpenMP
 omp_set_nested(1)
 If nested parallelism is disabled, then the new team created by a thread encountering a parallel construct inside a parallel region consists only of the encountering thread. If nested parallelism is enabled, then the new team may consist of more than one thread.
 
