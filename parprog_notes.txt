@@ -1,3 +1,40 @@
+
+# SPMD single program, multiple dat
+
+# MPI
+
+Using MPI you can write app on distributed memory also shared memory system.
+
+Communication is done by sending messages.
+
+# MPI Types of op
+
+point-to-point, collectives, one-sided
+
+SPMD programming model
+
+Typically: One signle program(source), is started as multiple processes on local or remote machines and each processes works on local data.
+
+Each process in a communicator is identified by its rank(id). Work distribution can be done using the rank.
+
+All data is private. If data has be accessed by another process, it has to be sent to this process.
+
+MPI runtime handles the startup of all processes and takes care about the enumeration of the processes(ranks).
+
+Distribution of processes to machines can be configured, but this is not part of the exercise. You will work on a shared memory machine, but there is no difference working on a remote machine, except for the performace issues.
+
+Debugging is difficult with MPI, even worse then OpenMP or Pthreads, because of multiple processes. It is, however, more deterministic then OpenMP or Pthreads, since you have do everything explicitly.
+
+This makes writing MPI app time consuming.
+
+Debugging can be done by printf(). MPI takes care that everything is printed on your terminal. An alternative is attaching a debugger to the running process.
+
+There are also commercial MPI debuggers and plugin for Eclipse called Parallel Tools Platform.
+
+
+
+
+
 # C++ forward declaration
 
 https://stackoverflow.com/questions/4757565/what-are-forward-declarations-in-c
