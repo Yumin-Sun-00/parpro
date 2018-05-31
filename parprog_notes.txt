@@ -1,3 +1,9 @@
+# MPI_Init
+
+Can only be called exactly once by each MPI process.
+Needs to be called by all processes MPI processes launched at startup
+In some environments, only one process is launched that then spawns the rest
+during MPI_Init.
 
 # SPMD single program, multiple dat
 
