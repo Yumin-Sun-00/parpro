@@ -13,7 +13,7 @@ void reverse(char *str, int strlen)
     static int FROM_ID = 0;
 
     int sublen = ceil(strlen / (size-1));
-    int restlen= sublen * (size-1) - strlen;
+    int restlen= strlen - sublen * (size-1);
 
     // Distribute jobs using the first process
     if ( rank == 0 )
