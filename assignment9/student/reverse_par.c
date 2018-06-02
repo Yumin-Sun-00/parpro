@@ -13,7 +13,7 @@ void reverse(char *str, int strlen)
     static int FROM_ID = 0;
 
     int sublen = ceil(strlen / (size-1));
-    static int restlen= sublen * (size-1) - strlen;
+    int restlen= sublen * (size-1) - strlen;
 
     // Distribute jobs using the first process
     if ( rank == 0 )
@@ -27,7 +27,7 @@ void reverse(char *str, int strlen)
     else if ( rank == size-1 && restlen != 0 )
     {
         MPI_Recv(str + sublen * (rank-1), restlen, MPI_CHAR, FROM_ID, 0, MPI_COMM_WORLD, MPI_STATUS_IGNORE); 
-        reverse_str(str + sublen * (rank-1), sublen);
+        reverse_str(str + sublen * (rank-1), restlen);
     }
     else
     {
