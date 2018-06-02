@@ -16,7 +16,7 @@ void reverse(char *str, int strlen)
     MPI_Comm_rank(MPI_COMM_WORLD, &rank); // Process id
     
     char* substr = str;
-    int substrlen = strlen / np;
+    int substrlen = int(strlen / np);
 
     if (rank == 0)
     {
