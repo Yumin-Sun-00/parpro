@@ -17,6 +17,9 @@ int main(int argc, char** argv)
     MPI_Comm_size(MPI_COMM_WORLD, &np);
     MPI_Comm_rank(MPI_COMM_WORLD, &rank);
 
+    //printf("Hello world from processor rank %d out of %d processors\n", rank, np);
+
+
     char *str = NULL; 
     int str_len = strlen(argv[1]);
 

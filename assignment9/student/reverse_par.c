@@ -29,5 +29,6 @@ void reverse(char *str, int strlen)
                      0, MPI_COMM_WORLD);
 
     reverse_str(&str[displs[rank]], scounts[rank]);
+
     return;
 }
