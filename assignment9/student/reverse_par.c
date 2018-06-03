@@ -27,17 +27,21 @@ void reverse(char *str, int strlen)
     int rest = strlen - stride * (gsize-1);
     if (rest != 0) scounts[gsize-1] = rest;
 
-    char rbufs[strlen];
+    char rbufs[stride];
     
     // Distribute jobs
-    MPI_Scatterv(str, scounts, displs, sendtype,  \
-                 rbufs, stride, recvtype,           \
-                 ROOT, MPI_COMM_WORLD);
 
-    reverse_str(&rbufs[displs[rank]], scounts[rank]);
-    
-//    MPI_Finalize();
-    free(scounts);
-    free(displs);
+    MPI_Scatterv(str, scounts, displs, sendtype,  \
+                     rbufs, stride, recvtype,     \
+                     ROOT, MPI_COMM_WORLD);
+    //print(const char c[], int n);
+    printf("%d: ", rank);
+    print(rbufs,scounts[rank]);
+
+
+    //reverse_str(&rbufs[displs[rank]], scounts[rank]);
+
+    //free(scounts);
+    //free(displs);
     return;
 }

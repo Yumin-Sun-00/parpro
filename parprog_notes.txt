@@ -1,4 +1,14 @@
 # MPI_Scatterv
+
+The outcome is as if the root executed n send operations,
+
+
+    MPI_Send(sendbuf + displs[i] * extent(sendtype), \
+             sendcounts[i], sendtype, i, ...)
+and each process executed a receive,
+    MPI_Recv(recvbuf, recvcount, recvtype, root, ...)
+The send buffer is ignored for all nonroot processes.
+
 common purposes of scatter and scatterv:
 
 1. To send out different chunks of data to different processes.
