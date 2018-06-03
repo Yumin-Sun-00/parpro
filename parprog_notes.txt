@@ -1,3 +1,17 @@
+# MPI_Scatterv
+common purposes of scatter and scatterv:
+
+1. To send out different chunks of data to different processes.
+2. Not to act like a broadcast, in which the same data goes to all.
+
+Recall that the goal of a scatter is to distribute different chunks of data to diff tasks, in other words, you want to split up your data among the processes. Recall also that a scatter is not the same as a broadcast, since in a broadcast, everyone is sent the same chunk of data.
+
+
+sendcounts(I) is the number of items of type SENDTYPE to send from process ROOT to process I.
+
+displs(I) is the displacement from SENDBUF to the beginning of the I-th message, in units of SENDTYPE. It also has significance only the ROOT process.
+
+
 # MPI_COMM_WORLD
 Any communication operations is done in the context of a communicator
 # MPI_ERR_ARG
