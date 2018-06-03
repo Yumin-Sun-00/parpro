@@ -13,8 +13,6 @@ void reverse(char *str, int strlen)
     MPI_Comm_size (MPI_COMM_WORLD, &gsize);
     int stride = ceil( (float) strlen / (float) gsize);
 
-    //printf("%d: ", stride);
-
     // MPI_Scatterv params
     int *displs, *scounts; 
     displs = (int *)malloc(gsize*sizeof(int)); 
@@ -25,6 +23,13 @@ void reverse(char *str, int strlen)
     } 
     int rest = strlen - stride * (gsize-1);
     if (rest != 0) scounts[gsize-1] = rest;
+    
+    int *rev_displs;
+    rev_displs = (int*)malloc(gsize*sizeof(int));
+    for(int i =0; i < gsize; i++)
+    {
+        rev_displs[i]=strlen-i*stride-scounts[i] ;
+    }
 
     char rbufs[gsize][stride];
 
@@ -34,20 +39,21 @@ void reverse(char *str, int strlen)
                      0, MPI_COMM_WORLD);
 
     /* print what each process received*/
-    printf("Rank %d: ", rank);
-    print(rbufs[rank],scounts[rank]);
+    printf("rank %d:, displ: %d, scounts: %d, chunk: %s, rev_displs: %d", rank, displs[rank],scounts[rank],rbufs[rank],rev_displs[rank]);
     printf("\n");
-
     reverse_str(rbufs[rank], scounts[rank]);
     printf("Reversed:%s",rbufs[rank]);
     printf("\n");
-    //int revdisp = 
-    /* Gather
+    strncpy(&str[rev_displs[rank]], rbufs[rank], scounts[rank]);    
+    
+/* Gather
     MPI_Gatherv(
     sendbuf, sendcount, sendtype,
     recvbuf, recvcounts, displs, recvtype,
     root, comm); */
-    MPI_Gatherv(rbufs, stride, MPI_CHAR, str, scounts, displs, MPI_CHAR,0, MPI_COMM_WORLD);
-    
+   free(displs);
+free(scounts);
+free(rev_displs);
+
     return;
 }
