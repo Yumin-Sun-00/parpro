@@ -7,7 +7,7 @@
 
 void reverse(char *str, int strlen)
 {
-    
+    printf("strlen: %d", strlen);    
     int gsize, rank;
     MPI_Comm_rank( MPI_COMM_WORLD, &rank);
     MPI_Comm_size (MPI_COMM_WORLD, &gsize);
