@@ -13,10 +13,6 @@ void reverse(char *str, int strlen)
     int stride = ceil(strlen / (gsize));
 
     // MPI_Scatterv params
-    int ROOT = 0;
-    MPI_Datatype sendtype = MPI_CHAR;
-    MPI_Datatype recvtype = MPI_CHAR;
-    
     int *displs, *scounts; 
     displs = (int *)malloc(gsize*sizeof(int)); 
     scounts = (int *)malloc(gsize*sizeof(int));
@@ -26,22 +22,12 @@ void reverse(char *str, int strlen)
     } 
     int rest = strlen - stride * (gsize-1);
     if (rest != 0) scounts[gsize-1] = rest;
-
-    char rbufs[stride];
     
     // Distribute jobs
+    MPI_Scatterv(str, scounts, displs, MPI_CHAR,  \
+                     str, stride, MPI_CHAR,       \
+                     0, MPI_COMM_WORLD);
 
-    MPI_Scatterv(str, scounts, displs, sendtype,  \
-                     rbufs, stride, recvtype,     \
-                     ROOT, MPI_COMM_WORLD);
-    //print(const char c[], int n);
-    printf("%d: ", rank);
-    print(rbufs,scounts[rank]);
-
-
-    //reverse_str(&rbufs[displs[rank]], scounts[rank]);
-
-    //free(scounts);
-    //free(displs);
+    reverse_str(&str[displs[rank]], scounts[rank]);
     return;
 }
