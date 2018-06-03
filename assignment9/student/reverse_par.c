@@ -7,13 +7,20 @@
 
 void reverse(char *str, int strlen)
 {
-    int size, rank;
+    int gsize, rank;
     MPI_Comm_rank( MPI_COMM_WORLD, &rank);
-    MPI_Comm_size (MPI_COMM_WORLD, &size);
+    MPI_Comm_size (MPI_COMM_WORLD, &gsize);
     static int FROM_ID = 0;
+    
+    MPI_Comm comm;
+    int root, rbuf[100];
+    int sublen = ceil(strlen / (gsize));
+    int restlen= strlen - sublen * (gsize-1);
 
-    int sublen = ceil(strlen / (size-1));
-    int restlen= strlen - sublen * (size-1);
+    MPI_Scatterv(str, &sublen, const int *displs,
+                 MPI_Datatype sendtype, void *recvbuf, int recvcount,
+                 MPI_Datatype recvtype,
+                 int root, MPI_Comm comm)
 
     // Distribute jobs using the first process
     if ( rank == 0 )
