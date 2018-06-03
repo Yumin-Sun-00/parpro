@@ -36,7 +36,7 @@ void reverse(char *str, int strlen)
 
     reverse_str(&rbufs[displs[rank]], scounts[rank]);
     
-    MPI_Finalize();
+//    MPI_Finalize();
     free(scounts);
     free(displs);
     return;
