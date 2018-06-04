@@ -12,7 +12,7 @@ void reverse(char *str, int strlen)
     MPI_Comm_rank( MPI_COMM_WORLD, &rank);
     MPI_Comm_size (MPI_COMM_WORLD, &gsize);
     int stride = ceil( (float) strlen / (float) gsize);
-
+    printf("stride %d\n",stride);
     // MPI_Scatterv params
     int *displs, *scounts; 
     displs = (int *)malloc(gsize*sizeof(int)); 
@@ -31,26 +31,24 @@ void reverse(char *str, int strlen)
         rev_displs[i]=strlen-i*stride-scounts[i] ;
     }
 
-    char rbufs[gsize][stride];
+    char rbufs[scounts[rank]];
 
     // Distribute jobs
     MPI_Scatterv(str, scounts, displs, MPI_CHAR,  \
-                     rbufs[rank], stride, MPI_CHAR,       \
+                      rbufs, scounts[rank], MPI_CHAR,       \
                      0, MPI_COMM_WORLD);
 
     /* print what each process received*/
-    printf("rank %d:, displ: %d, scounts: %d, chunk: %s, rev_displs: %d", rank, displs[rank],scounts[rank],rbufs[rank],rev_displs[rank]);
+    printf("Chunck from process %d is ",rank);
+    print(rbufs, scounts[rank]);
+    printf("rank %d:, displ: %d, scounts: %d, rev_displs: %d", rank, displs[rank],scounts[rank],rev_displs[rank]);
     printf("\n");
-    reverse_str(rbufs[rank], scounts[rank]);
-    printf("Reversed:%s",rbufs[rank]);
+    reverse_str(rbufs, scounts[rank]);
+    printf("Reversed:");
     printf("\n");
-    strncpy(&str[rev_displs[rank]], rbufs[rank], scounts[rank]);    
+    print(rbufs,scounts[rank]);
+    strncpy(&str[rev_displs[rank]], rbufs, scounts[rank]);    
     
-/* Gather
-    MPI_Gatherv(
-    sendbuf, sendcount, sendtype,
-    recvbuf, recvcounts, displs, recvtype,
-    root, comm); */
    free(displs);
 free(scounts);
 free(rev_displs);
