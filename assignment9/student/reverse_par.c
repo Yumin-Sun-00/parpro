@@ -28,7 +28,7 @@ void reverse(char *str, int strlen)
     if (rest != 0)
     {
         scounts[gsize-1] = rest;
-        r_displ[gsize-1] = strlen-i*stride-rest;
+        r_displ[gsize-1] = 0;
     }
 
 
