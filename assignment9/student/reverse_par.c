@@ -61,16 +61,12 @@ void reverse(char *str, int strlen)
             char recv[scounts[i]];
             MPI_Recv(recv, scounts[i], MPI_CHAR, i, 16, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
             strncpy(&str[rev_displs[i]], recv, scounts[i]);
-        }
+	}
 
     }
     else
     {
-        for(int i = 1; i <gsize; i++)
-        {
-            MPI_Send(rbufs, scounts[i], MPI_CHAR, 0, 16, MPI_COMM_WORLD);
-        }
-
+            MPI_Send(rbufs, scounts[rank], MPI_CHAR, 0, 16, MPI_COMM_WORLD);
     }
 
 //    for(int i = 0; i<scounts[rank]; i++)
