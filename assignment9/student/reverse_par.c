@@ -42,7 +42,7 @@ void reverse(char *str, int strlen)
     // Collect results from processes
     if (rank == 0)
     {
-        memcpy(str+strlen-stride, rbufs, stride*sizeof(char));
+        memcpy(str+strlen-scounts[0], rbufs, scounts[0]*sizeof(char));
         for(int i = 1; i < gsize; i++)
         {
 	    char* recv  = (char*)malloc(scounts[i]*sizeof(char));
