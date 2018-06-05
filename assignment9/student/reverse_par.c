@@ -59,7 +59,7 @@ void reverse(char *str, int strlen)
         for(int i = 1; i < gsize; i++)
         {
             char recv[scounts[i]];
-            MPI_Revc(recv, scounts[i], MPI_CHAR, i, 16, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
+            MPI_Recv(recv, scounts[i], MPI_CHAR, i, 16, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
             strncpy(&str[rev_displs[i]], recv, scounts[i]);
         }
 
