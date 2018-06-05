@@ -11,28 +11,22 @@ void reverse(char *str, int strlen)
     MPI_Comm_rank( MPI_COMM_WORLD, &rank);
     MPI_Comm_size (MPI_COMM_WORLD, &gsize);
     int stride = floor( (float) strlen / (float) (gsize));
+    int rest = strlen%gsize;
 
     // MPI_Scatterv params
+//(i<strlen%np)
     int *displs,*scounts;
-    displs = (int *)malloc(gsize*sizeof(int));
-    scounts = (int *)malloc(gsize*sizeof(int));
+    displs = (int *)calloc(sizeof(int),gsize);
+    scounts = (int *)calloc(sizeof(int),gsize);
     for (int i=0; i < gsize; ++i)
     {
-	displs[i] = i*stride;   
-        scounts[i] = stride;
+	scounts[i] = stride + ( i < rest );
+	if (i == 0)
+		displs[0]=0;
+	else
+		displs[i] = displs[i-1] + scounts[i-1];   
+
     }
-    int rest = strlen - stride * (gsize);
-    if (rest != 0)
-    {
-        int i = 0;
-        while(rest!=0 && i < gsize-1)
-        {
-            scounts[i] = scounts[i]+ 1;
-            rest = rest - 1;
-            i = i + 1;
-        }
-    }
-    printf("rest %d, stride %d\n", rest,stride);
     printf("rank %d, displs %d, scounts %d\n",rank,displs[rank],scounts[rank]);
 
     char* rbufs;//char rbufs[scounts[rank]];
