@@ -37,10 +37,11 @@ void reverse(char *str, int strlen)
     // Collect results from processes
     if (rank == 0)
     {
-        memcpy(str+strlen-scounts[0], rbufs, scounts[0]*sizeof(char));
+        memcpy(str+strlen-stride, rbufs, stride*sizeof(char));
         for(int i = 1; i < gsize; i++)
         {
-            char recv[scounts[i]];
+	    char* recv  = (char*)malloc(scounts[i]*sizeof(char));
+            //char recv[scounts[i]];
             MPI_Recv(recv, scounts[i], MPI_CHAR, i, 0, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
             memcpy(str+strlen-displs[i]-scounts[i], recv, scounts[i]*sizeof(char));
 	}
