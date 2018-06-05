@@ -16,14 +16,22 @@ void reverse(char *str, int strlen)
     int *displs,*scounts;
     displs = (int *)malloc(gsize*sizeof(int));
     scounts = (int *)malloc(gsize*sizeof(int));
+    int *r_displ;
+    r_displ = (int*) malloc ( gsize * sizeof (int) );
     for (int i=0; i < gsize; ++i)
     {
 	displs[i] = i*stride;   
         scounts[i] = stride;
+        r_displ[i] = strlen-i*stride-stride;
     }
     int rest = strlen - stride * (gsize-1);
-    if (rest != 0) scounts[gsize-1] = rest;
-    
+    if (rest != 0)
+    {
+        scounts[gsize-1] = rest;
+        r_displ[gsize-1] = strlen-i*stride-rest;
+    }
+
+
     char rbufs[scounts[rank]];
 
     // Distribute jobs
@@ -35,13 +43,6 @@ void reverse(char *str, int strlen)
 
     if (rank == 0)
     {
-        int *r_displ;
-        r_displ = (int*)malloc(gsize*sizeof(int));
-        for(int i =0; i < gsize; i++)
-        {
-            r_displ[i]=strlen-i*stride-scounts[i] ;
-        }
-
         strncpy(&str[r_displ[0]], rbufs, scounts[0]);
         for(int i = 1; i < gsize; i++)
         {
@@ -49,7 +50,7 @@ void reverse(char *str, int strlen)
             MPI_Recv(recv, scounts[i], MPI_CHAR, i, 16, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
             strncpy(&str[r_displ[i]], recv, scounts[i]);
 	}
-	free(r_displ);
+        //free(r_displ);
     }
     else
     {
@@ -58,7 +59,6 @@ void reverse(char *str, int strlen)
 
    free(displs);
    free(scounts);
-   //free(rev_displs);
-
-    return;
+   free(r_displ);
+   return;
 }
