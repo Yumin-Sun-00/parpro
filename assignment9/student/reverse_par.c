@@ -19,7 +19,7 @@ void reverse(char *str, int strlen)
     for (int i=0; i < gsize; ++i)
     {
 	displs[i] = i*stride;   
-        //scounts[i] = stride;
+        scounts[i] = stride;
     }
     int rest = strlen - stride * (gsize);
     if (rest != 0)
@@ -27,14 +27,13 @@ void reverse(char *str, int strlen)
         int i = 0;
         while(rest!=0 && i < gsize-1)
         {
-            scounts[i] = stride + 1;
+            scounts[i] = scounts[i]+ 1;
             rest = rest - 1;
             i = i + 1;
         }
-        scounts[gsize -1] = stride;
-
     }
-
+    printf("rest %d, stride %d\n", rest,stride);
+    printf("rank %d, displs %d, scounts %d\n",rank,displs[rank],scounts[rank]);
 
     char* rbufs;//char rbufs[scounts[rank]];
     rbufs  = (char*)malloc(scounts[rank]*sizeof(char));
