@@ -20,14 +20,14 @@ void reverse(char *str, int strlen)
     scounts = (int *)calloc(sizeof(int),gsize);
     for (int i=0; i < gsize; ++i)
     {
-	scounts[i] = stride + ( i < rest );
+        scounts[i] = stride + ( i < rest );
 	if (i == 0)
 		displs[0]=0;
 	else
 		displs[i] = displs[i-1] + scounts[i-1];   
 
     }
-    printf("rank %d, displs %d, scounts %d\n",rank,displs[rank],scounts[rank]);
+//    printf("rank %d, displs %d, scounts %d\n",rank,displs[rank],scounts[rank]);
 
     char* rbufs;//char rbufs[scounts[rank]];
     rbufs  = (char*)malloc(scounts[rank]*sizeof(char));
