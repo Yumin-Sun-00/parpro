@@ -47,15 +47,22 @@ void reverse(char *str, int strlen)
     printf("Reversed:");
     printf("\n");
     print(rbufs,scounts[rank]);
+
+
+    if (rank == 0)
+    {
+    
+    }
+
     for(int i = 0; i<scounts[rank]; i++)
     {
-        str[rev_displs[rank]+i] = rbufs[i];
+	str[rev_displs[rank]+i] = rbufs[i];
     }    
 //strncpy(&str[rev_displs[rank]], rbufs, scounts[rank]);    
     
    free(displs);
-free(scounts);
-free(rev_displs);
+   free(scounts);
+   free(rev_displs);
 
     return;
 }
