@@ -43,18 +43,20 @@ void reverse(char *str, int strlen)
         {
             r_displ[i]=strlen-i*stride-scounts[i] ;
         }
-        strncpy(&str[r_displ[0]], rbufs, scounts[0]);
+        memcpy(&str[r_displ[0]], rbufs, scounts[0]*sizeof(char));
+        //strncpy(&str[r_displ[0]], rbufs, scounts[0]);
         for(int i = 1; i < gsize; i++)
         {
-            char recv[scounts[i]];
-            MPI_Recv(recv, scounts[i], MPI_CHAR, i, 16, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
-            strncpy(&str[r_displ[i]], recv, scounts[i]);
+            //char recv[scounts[i]];
+            MPI_Recv(rbufs, scounts[i], MPI_CHAR, i, 0, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
+            memcpy(&str[r_displ[i]], rbufs, scounts[i]*sizeof(char));
+            //strncpy(&str[r_displ[i]], recv, scounts[i]);
 	}
         free(r_displ);
     }
     else
     {
-            MPI_Send(rbufs, scounts[rank], MPI_CHAR, 0, 16, MPI_COMM_WORLD);
+            MPI_Send(rbufs, scounts[rank], MPI_CHAR, 0, 0, MPI_COMM_WORLD);
     }
 
    free(displs);
