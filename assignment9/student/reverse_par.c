@@ -47,9 +47,9 @@ void reverse(char *str, int strlen)
         //strncpy(&str[r_displ[0]], rbufs, scounts[0]);
         for(int i = 1; i < gsize; i++)
         {
-            //char recv[scounts[i]];
-            MPI_Recv(rbufs, scounts[i], MPI_CHAR, i, 0, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
-            memcpy(&str[r_displ[i]], rbufs, scounts[i]*sizeof(char));
+            char recv[scounts[i]];
+            MPI_Recv(recv, scounts[i], MPI_CHAR, i, 0, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
+            memcpy(&str[r_displ[i]], recv, scounts[i]*sizeof(char));
             //strncpy(&str[r_displ[i]], recv, scounts[i]);
 	}
         free(r_displ);
