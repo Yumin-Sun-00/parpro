@@ -7,13 +7,18 @@
 
 void reverse(char *str, int strlen)
 {
-    //printf("strlen: %d", strlen);
+    printf("strlen: %d ", strlen);
     int gsize, rank;
     MPI_Comm_rank( MPI_COMM_WORLD, &rank);
     MPI_Comm_size (MPI_COMM_WORLD, &gsize);
-    int stride = ceil( (float) strlen / (float) gsize);
-    //printf("stride %d\n",stride);
-
+    
+    int stride = floor( (float) strlen / (float) gsize);
+    printf("stride %d\n",stride);
+    if ( (float)strlen/(float) gsize < 1)
+    {
+	gsize = strlen;
+        stride = 1;
+    }
     // MPI_Scatterv params
     int *displs, *scounts; 
     displs = (int *)malloc(gsize*sizeof(int)); 
