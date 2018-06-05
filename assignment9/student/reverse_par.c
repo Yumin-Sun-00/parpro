@@ -24,17 +24,17 @@ void reverse(char *str, int strlen)
     int rest = strlen - stride * (gsize-1);
     if (rest != 0) scounts[gsize-1] = rest;
 
-    //char rbufs[scounts[rank]];
-    char* rbufs;
+    char* rbufs;//char rbufs[scounts[rank]];
     rbufs  = (char*)malloc(scounts[rank]*sizeof(char));
 
     // Distribute jobs
     MPI_Scatterv(str, scounts, displs, MPI_CHAR,  \
                       rbufs, scounts[rank], MPI_CHAR,       \
                      0, MPI_COMM_WORLD);
-
+    // Reverse
     reverse_str(rbufs, scounts[rank]);
 
+    // Collect results from processes
     if (rank == 0)
     {
 	int *r_displ;
@@ -44,13 +44,11 @@ void reverse(char *str, int strlen)
             r_displ[i]=strlen-i*stride-scounts[i] ;
         }
         memcpy(&str[r_displ[0]], rbufs, scounts[0]*sizeof(char));
-        //strncpy(&str[r_displ[0]], rbufs, scounts[0]);
         for(int i = 1; i < gsize; i++)
         {
             char recv[scounts[i]];
             MPI_Recv(recv, scounts[i], MPI_CHAR, i, 0, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
             memcpy(&str[r_displ[i]], recv, scounts[i]*sizeof(char));
-            //strncpy(&str[r_displ[i]], recv, scounts[i]);
 	}
         free(r_displ);
     }
