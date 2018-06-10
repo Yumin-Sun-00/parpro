@@ -1,3 +1,113 @@
+#MPI datatype 
+construct new datatype: continue datatype
+two diff on sender and reciever: reduce copy?? row matrix, column matrix
+
+serialize a set of datatype to a string, on reciever side, you decode the datatype.
+
+reshuffling???
+
+recursive specification is allowed, which case ?
+
+MPI optimize datatype, it could be costly. Whta it means with optimizaton on datatype?
+
+You always need commit before you communicate with it in network.
+If you don't use it anymore you should free it.
+
+You are allowed to have gap between each blocklength using stride.
+stride =  number of old datatype, not Bytes.
+
+#index datatype
+you could specify differen length of block and displaysment.
+Displaysment are in Bytes(MPI_Aint), because you have multiple old datatypes, there is no reason to counts on number of olddatatype.
+Blocklenth are still counts in olddatatype.
+
+MPI_Type_get_extent??
+
+double in C: 8 Bytes
+char: 1 Byte
+
+C compiler will do padding
+Example:
+what is the extend of datatype?
+16
+# You always need to query how long it extend.
+# The stride will counts on extent old datatype!!!
+
+48.???
+
+# Subarray datatype
+useful for halo.
+
+h-version:
+use Byte-sized strides.
+
+# Inspect datatype, help for debugging, optimization
+
+MPI_Abort will kill MPI processes.
+
+# expensive overhead datatype creation/deconstruction
+Many MPI implementations are not optimized for datatypes. 
+
+# Communication modes
+public mem region -> no process synchr needed anymore.
+
+sometimes, the public mem have to be located in specific pages,locations, (network cards), in this case you need WIN_ALLOCATE, this means you query for a Window which is easier for MPI.
+
+dynamic window: keep in mind synchronization is needed.
+
+Win_create:
+info: good for MPI optimization
+disp_unit: for example double, specify 8 bytes for stride in that window.
+
+Win_allocate:
+base
+
+Create_dynamic:
+remember displaysment is always 1 byte.
+
+Win_attach:
+win has to be dynamic window type.
+user has to ensur the mem is attached befor use it.
+
+Remember to free window.
+
+Accumulate: you don need to get data from remote, do some op on it and send it back, you just direct modify on remote memory.
+Predifined op only, no user-defined!
+
+Put is faster,and it could be failed because of consistency. accumulate is slow but you have an atomic put with MPI_REPLACE.
+
+
+
+Remote/target:
+you have a very limited datatype, no complex.
+
+# How to ensure consistency and concurrency?
+W-a-W: you are not sure what will happend, therfore you always need synchronizaton. -> atomic put!
+
+All accumulate ops are ordered by default.
+
+When is remotely accesible for read/write? ->Synchronization.
+
+Epoch.
+
+Synchronizaion is costly.
+
+Fence: collective!
+
+post-wait: open window
+It is potientialy blocked for all 4 OPs.
+
+Data concurrency means that many users can access data at the same time.
+
+Data consistency means that each user sees a consistent view of the data, including visible changes made by the user's own transactions and transactions of other users.
+
+# MPI_Init_thread
+
+
+
+
+
+
 # MPI_Scatterv
 
 The outcome is as if the root executed n send operations,
