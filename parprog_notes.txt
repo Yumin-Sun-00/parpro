@@ -1,3 +1,68 @@
+#Tutorial advanced MPI
+the speedup is 150..because the s3 loop order is reversed. columnwise -> rowwise.
+
+#Blocking commuication
+Circular communication
+
+Last time: Deadlock
+if you don't flip recv send, you will get deadlock.
+And to do this, you actually then serialize everything, and it is not what we want.
+
+Today we will see how to solve this problem.
+
+0 -> 1 -> 2 -> 3 -> 4 
+			<-
+
+-> 0 ...
+
+
+A two phases communication:
+-> first phase
+-----> second phase
+	0 -> 1  	2 -> 3  ----->
+		----->
+----->
+
+
+MPI_Sendrecv still produces blocking, but MPI helps you to solve this already.
+
+
+MPI_Sendrecv_replace
+Sends and receives using a single buffer.
+This routine is thread-safe. This means that this routine may be safely used by multiple threads without the need for any user-provided thread locks.
+
+MPI_Isend
+Since MPI_Isend and MPI_Irecv return immediately, and finalize also return immediatly, you have to use MPI_Waitall()
+
+#MPI collectives
+previsously point-point communication
+
+Now, A group of processes, call collective functions, this happen among of them.
+
+Neighbor collectives
+
+A barrier is collective.
+
+#MPI_Bcast
+collective functions means every process should call it, if you do this:
+if rank==0
+	MPI_Bcast(...)
+else
+	...
+then you will get a deadlock.
+
+MPI_Reduce
+All to one
+
+sum up a large array, at the end the partial sum to total sum:
+That could apply MPI_reduce
+
+MPI_Allreduce...
+
+Alltoall
+
+
+
 #MPI datatype 
 construct new datatype: continue datatype
 two diff on sender and reciever: reduce copy?? row matrix, column matrix
