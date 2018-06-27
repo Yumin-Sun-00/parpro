@@ -1,0 +1,24 @@
+# domain decomposition:
+Thnik about data parallization on two diff data structure: array and list.
+	heat_new
+	sources: a list of (x,y); After you finish domain compuation on heat_new, do some specific computation at that location
+	
+	Each process gets a specific source.
+	List, local list...
+
+Assignment 12:
+
+MPI_THREAD_FUNNELED
+
+MPI process1,	MPI process2
+master thread	master thread
+thread2		thread2
+thread3		thread3
+...		...
+threadM		threadN
+
+
+Only the master threads are responsible for communication between two MPI processes.
+
+9 Assignments are required for bonus.
+
