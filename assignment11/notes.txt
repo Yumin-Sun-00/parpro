@@ -1,0 +1,6 @@
+modify CoMD Makefile
+make clean
+make
+LD_LIBRARY_PATH=/usr/stud/suny/softwares/mpiP mpirun -np 16 ./bin/CoMD-mpi -i 4 -j 2 -k 2 -x 40 -y 40 -z 40
+
+the path indicated libmpip.so

@@ -1,0 +1,34 @@
+collective: reduce, broadcast
+
+P2P:
+synch. send: wait recieve starts.
+asynch. send: don't care whether the reciever starts. mpi buffer send: pass a comm. buffer
+
+MPI_Send
+MPI_Isend
+MPI_Ssend
+MPI_ISsend
+
+small message: MPI tends to use buffer send.
+Large message: non-buffered send.
+There is a certain threshold which will trigger buffer send to non-buffer send.
+
+Ready send: it always complete.
+
+Blocking: blocking calls.
+non-blocking: non blocking calls terminate immediatedly and return request.
+
+me: "HW, send me the data, at some point I will check whether you completed."
+
+
+Blocking P2P communication:
+MPI_Send: you don't know whether it is (non-)buffered send, (a)synch send...
+MPI rank is only valid inside certain MPI communicator.(namespace)
+MPI_Recv:
+status: query src, recieved message.
+
+MPI_Iprobe
+
+
+
+
