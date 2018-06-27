@@ -26,7 +26,7 @@ MPI_INCLUDE =
 
 ### A place to specify any other include or library switches your
 ### platform requires.
-OTHER_LIB =
+OTHER_LIB = -L /usr/stud/suny/softwares/mpiP -lmpiP -ldl -lm -lunwind
 OTHER_INCLUDE =
 
 # clear all suffixes
