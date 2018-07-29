@@ -14,21 +14,22 @@ int main(int argc, char *argv[]) {
 	#pragma omp single
 	{
 //	#pragma omp section
-		#pragma omp task
+		#pragma omp task //shared(x)
 		{
 			printf("In Task1: Thread execute this task:%d, thread execute single=%d, NumThread:%d\n", omp_get_thread_num(),iam, omp_get_num_threads() );
           
 			x++;
-		//	printf("After task1: x = %d\n",x);
+			printf("After task1: x = %d\n",x);
 
 		}
 	#pragma omp taskwait
-	#pragma omp task
+	#pragma omp task //shared(x)
 		{
 printf("In Task2: Thread execute this task:%d, thread execute single=%d, TNumThread:%d\n", omp_get_thread_num(),iam, omp_get_num_threads() );
 			x++;
-		//	printf("After task2: x = %d\n",x);
+			printf("After task2: x = %d\n",x);
 		}
     }
+ printf("x = %d\n",x);
 }
 }

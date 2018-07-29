@@ -1,3 +1,7 @@
+#pragma omp task
+default is firstprivate!!
+
+
 #pragma omp single:
 
 number of threads remain same as outside of single region, but only the thread first arrive will execute the region, other threads wait at the barrier.
