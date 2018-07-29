@@ -1,0 +1,7 @@
+#pragma omp single:
+
+number of threads remain same as outside of single region, but only the thread first arrive will execute the region, other threads wait at the barrier.
+
+#pragma omp critival or atomic
+
+only one thread could enter to the critical region, others blocked and wait the last thread to finish his work, if it finished, the next one go into critical region. Therefore, if there are p threads before critical region, the region will be executed p times.
