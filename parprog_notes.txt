@@ -1,3 +1,21 @@
+# Q/A
+Exam
+General parallel programming knowledge
+Understanding programs present in tutorials or lectures
+Implementation
+
+# Important MPI
+Collective operation P2P
+scatter P2P
+efficient MPI reduction
+Non-blocking communication, pay attention at where to Wait, where you don't have to Wait.
+
+# Signature no need to be 100% in heart, small syntax error is tolerant.
+But you should know COMM, Send, buffer recv...
+MPI_Isend vs MPI_Send: programmer is responsible to the reusability of the send buffer when using Isend, because it is non-blocking and return immediately.
+
+
+
 #Tutorial advanced MPI
 the speedup is 150..because the s3 loop order is reversed. columnwise -> rowwise.
 
